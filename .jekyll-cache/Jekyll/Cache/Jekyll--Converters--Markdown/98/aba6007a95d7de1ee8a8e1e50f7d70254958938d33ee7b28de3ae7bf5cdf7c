@@ -1,0 +1,44 @@
+I"s<h2>SecurityConfig</h2>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Configuration</span> 
+<span class="nd">@EnableWebSecurity</span> 
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">SecurityConfig</span> <span class="kd">extends</span> <span class="nc">WebSecurityConfigurerAdapter</span> <span class="o">{</span>
+
+    <span class="c1">// 의존성 주입</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">configure</span><span class="o">(</span><span class="nc">WebSecurity</span> <span class="n">web</span><span class="o">)</span> <span class="kd">throws</span> <span class="nc">Exception</span> <span class="o">{</span>
+        <span class="n">web</span><span class="o">.</span><span class="na">ignoring</span><span class="o">().</span><span class="na">antMatchers</span><span class="o">(</span><span class="s">"/css/**"</span><span class="o">,</span> <span class="s">"/js/**"</span><span class="o">,</span> <span class="s">"/img/**"</span><span class="o">,</span> <span class="s">"/lib/**"</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">protected</span> <span class="kt">void</span> <span class="nf">configure</span><span class="o">(</span><span class="nc">HttpSecurity</span> <span class="n">http</span><span class="o">)</span> <span class="kd">throws</span> <span class="nc">Exception</span> <span class="o">{</span>
+        <span class="n">http</span><span class="o">.</span><span class="na">authorizeRequests</span><span class="o">()</span>
+                <span class="o">.</span><span class="na">antMatchers</span><span class="o">(</span><span class="s">"/"</span><span class="o">,</span> <span class="s">"/error"</span><span class="o">,</span> <span class="s">"/favicon.ico"</span><span class="o">,</span>
+                        <span class="s">"/**/*.css"</span><span class="o">,</span>
+                        <span class="s">"/**/*.js"</span><span class="o">,</span>
+                        <span class="s">"/**/*.png"</span><span class="o">,</span>
+                        <span class="s">"/**/*.jpg"</span><span class="o">,</span>
+                        <span class="s">"/login*/*"</span><span class="o">).</span><span class="na">permitAll</span><span class="o">()</span>
+                <span class="o">.</span><span class="na">antMatchers</span><span class="o">(</span><span class="s">"/member/*"</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">authenticated</span><span class="o">()</span>
+                <span class="o">.</span><span class="na">and</span><span class="o">()</span>
+            <span class="o">.</span><span class="na">formLogin</span><span class="o">()</span>
+                <span class="o">.</span><span class="na">loginPage</span><span class="o">(</span><span class="s">"/login"</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">successHandler</span><span class="o">(</span><span class="n">customAuthenticationSuccessHandler</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">failureHandler</span><span class="o">(</span><span class="n">customAuthenticationFailHandler</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">and</span><span class="o">()</span>
+            <span class="o">.</span><span class="na">logout</span><span class="o">()</span>
+                <span class="o">.</span><span class="na">logoutSuccessUrl</span><span class="o">(</span><span class="s">"/login"</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">logoutRequestMatcher</span><span class="o">(</span><span class="k">new</span> <span class="nc">AntPathRequestMatcher</span><span class="o">(</span><span class="s">"/logout"</span><span class="o">))</span>
+                <span class="o">.</span><span class="na">invalidateHttpSession</span><span class="o">(</span><span class="kc">true</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">protected</span> <span class="kt">void</span> <span class="nf">configure</span><span class="o">(</span><span class="nc">AuthenticationManagerBuilder</span> <span class="n">auth</span><span class="o">)</span> <span class="kd">throws</span> <span class="nc">Exception</span> <span class="o">{</span>
+        <span class="n">auth</span><span class="o">.</span><span class="na">authenticationProvider</span><span class="o">(</span><span class="n">authenticationProvider</span><span class="o">());</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>* 
+</code></pre></div></div>
+:ET

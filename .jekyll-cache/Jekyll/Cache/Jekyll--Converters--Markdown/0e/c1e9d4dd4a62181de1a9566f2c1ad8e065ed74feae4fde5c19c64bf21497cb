@@ -1,0 +1,102 @@
+I"2<blockquote>
+  <p>[Github] spring-bot
+<a href="https://www.inflearn.com/course/ORM-JPA-Basic#">https://www.inflearn.com/course/ORM-JPA-Basic#</a></p>
+</blockquote>
+
+<h2>application.properties</h2>
+
+<ul>
+  <li>DB 설정
+    <div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="c">#MySQL</span>
+  spring.datasource.driver-class-name<span class="o">=</span>com.mysql.cj.jdbc.Driver
+  spring.datasource.url<span class="o">=</span>jdbc:mysql://<span class="o">{</span>host<span class="o">}</span>:<span class="o">{</span>port<span class="o">}</span>/<span class="o">{</span>database_name<span class="o">}</span>?serverTimezone<span class="o">=</span>UTC&amp;characterEncoding<span class="o">=</span>UTF-8
+  spring.datasource.username<span class="o">={</span>username<span class="o">}</span>
+  spring.datasource.password<span class="o">={</span>password<span class="o">}</span>
+  spring.datasource.initialization-mode<span class="o">=</span>always <span class="c">#always    </span>
+</code></pre></div>    </div>
+  </li>
+  <li>JPA 설정
+    <div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>spring.jpa.show-sql<span class="o">=</span><span class="nb">true
+</span>spring.jpa.database<span class="o">=</span>mysql <span class="c">#사용할 DB</span>
+spring.jpa.database-platform<span class="o">=</span>org.hibernate.dialect.MySQL5InnoDBDialect
+spring.jpa.hibernate.ddl-auto<span class="o">=</span>none // 사용하지 않음
+</code></pre></div>    </div>
+    <p>spring.jpa.hibernate.ddl-auto=옵션</p>
+    <ul>
+      <li>create : 기존 테이블 삭제 후 다시 생성</li>
+      <li>create-drop : 종료 시점에서 테이블 삭제</li>
+      <li>update : 변경분만 반영</li>
+      <li>validate : 변경된 매핑 정보가 있다면 애플리케이션 종료</li>
+    </ul>
+
+    <p><code class="language-plaintext highlighter-rouge">DDL 자동생성은 운영서버에서는 사용하지 말 것</code></p>
+  </li>
+  <li>
+    <p>JSP &amp; Thymeleaf</p>
+
+    <p>spring-boot-starer에 포함된 tomcat은 JSP엔진을 포함하지 않아 추가 설정 필요</p>
+
+    <p>뷰 구분을 위해 컨트롤러가 반환시 ‘thymeleaf/’로 시작하면 타임리프로 처리하도록 지정</p>
+
+    <div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="c"># JSP 설정</span>
+spring.mvc.view.prefix<span class="o">=</span>/WEB-INF/jsp/ <span class="c">#디렉터리 경로</span>
+spring.mvc.view.suffix<span class="o">=</span>.jsp <span class="c">#확장자</span>
+</code></pre></div>    </div>
+    <div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Thymeleaf 설정</span>
+spring.thymeleaf.prefix<span class="o">=</span>classpath:/templates/ <span class="c">#디렉터리 경로</span>
+spring.thymeleaf.suffix<span class="o">=</span>.html <span class="c">#확장자</span>
+spring.thymeleaf.cache<span class="o">=</span><span class="nb">false</span> <span class="c">#캐시 저장x (실무에서는 true)</span>
+spring.thymeleaf.view-names<span class="o">=</span>thymeleaf/
+</code></pre></div>    </div>
+  </li>
+</ul>
+
+<h2>build.gralde</h2>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  dependencies <span class="o">{</span>
+    ...
+      <span class="c"># jsp 엔진, jstl 라이브러리</span>
+      compile<span class="o">(</span><span class="s1">'org.apache.tomcat.embed:tomcat-embed-jasper'</span><span class="o">)</span>
+      compile<span class="o">(</span><span class="s1">'javax.servlet:jstl:1.2'</span><span class="o">)</span>
+  <span class="o">}</span>
+</code></pre></div></div>
+
+<p><br /></p>
+
+<hr />
+<h4>템플린 엔진이란?</h4>
+<p><code class="language-plaintext highlighter-rouge">동적 컨텐츠를 생성하는 방법 (스프링 MVC 중 View)</code></p>
+
+<ul>
+  <li>
+    <p>클라이언트 사이드 템플릿 엔진</p>
+
+    <p>HTML 형태로 코드 작성되며 데이터를 받아 DOM 객체에 동적으로 그려주는 프로세스 담당</p>
+  </li>
+  <li>
+    <p>서버 사이드 템플릿 엔진</p>
+
+    <p>서버에서 가져온 데이터를 미리 정의된 템플릿에 넣어 HTML을 그린 뒤 클라이언트에 전달</p>
+
+    <ul>
+      <li>
+        <p>JSP</p>
+
+        <p>서블릿으로 변환되어 실행</p>
+
+        <p>JSP 내에서 자바 코드 사용 가능 (사용하지 못하도록 설정도 가능)</p>
+      </li>
+      <li>
+        <p>Thymeleaf</p>
+
+        <p>웹 및 독립형 환경에서 사용할 수 있는 Java 템플릿 엔진</p>
+
+        <p>퍼블리셔가 페이지를 생성하거나 수정 시 웹서버 실행하지 않고 오프라인에서 수정 가능</p>
+
+        <p>Java 코드 뷰 내에서 사용 가능</p>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+:ET

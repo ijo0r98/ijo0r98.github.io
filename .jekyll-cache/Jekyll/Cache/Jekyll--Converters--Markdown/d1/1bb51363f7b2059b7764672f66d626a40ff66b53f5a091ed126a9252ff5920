@@ -1,0 +1,37 @@
+I"�<h2>회원가입</h2>
+<h3>SignUp Form</h3>
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>회원 가입
+<span class="nt">&lt;form</span> <span class="na">action=</span><span class="s">"/signup"</span> <span class="na">method=</span><span class="s">"post"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">"hidden"</span> <span class="na">name=</span><span class="s">"${_csrf.parameterName}"</span> <span class="na">value=</span><span class="s">"${_csrf.token}"</span> <span class="nt">/&gt;</span>
+
+    이름 : <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">"text"</span> <span class="na">name=</span><span class="s">"memberNm"</span><span class="nt">/&gt;</span> <span class="nt">&lt;br/&gt;</span>
+    아이디 : <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">"text"</span> <span class="na">name=</span><span class="s">"memberId"</span><span class="nt">/&gt;</span> <span class="nt">&lt;br/&gt;</span>
+    비밀번호 : <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">"password"</span> <span class="na">name=</span><span class="s">"memberPw"</span><span class="nt">/&gt;</span> <span class="nt">&lt;br/&gt;</span>
+    핸드폰번호 : <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">"text"</span> <span class="na">name=</span><span class="s">"memberTell"</span><span class="nt">/&gt;</span> <span class="nt">&lt;br/&gt;</span>
+    이메일 : <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">"text"</span> <span class="na">name=</span><span class="s">"memberEmail"</span><span class="nt">/&gt;</span> <span class="nt">&lt;br/&gt;</span>
+
+    <span class="nt">&lt;button</span> <span class="na">type=</span><span class="s">"submit"</span><span class="nt">&gt;</span>회원가입<span class="nt">&lt;/button&gt;</span>
+<span class="nt">&lt;/form&gt;</span>
+</code></pre></div></div>
+
+<h3>MemberService</h3>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kt">void</span> <span class="nf">signUpMember</span><span class="o">(</span><span class="nc">Member</span> <span class="n">member</span><span class="o">)</span> <span class="o">{</span>
+        <span class="c1">//1</span>
+        <span class="nc">BCryptPasswordEncoder</span> <span class="n">passwordEncoder</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">BCryptPasswordEncoder</span><span class="o">();</span>
+        <span class="n">member</span><span class="o">.</span><span class="na">setMemberPw</span><span class="o">(</span><span class="n">passwordEncoder</span><span class="o">.</span><span class="na">encode</span><span class="o">(</span><span class="n">member</span><span class="o">.</span><span class="na">getPassword</span><span class="o">()));</span>
+        <span class="c1">//2</span>
+        <span class="n">member</span><span class="o">.</span><span class="na">setMemberId</span><span class="o">(</span><span class="n">member</span><span class="o">.</span><span class="na">getMemberId</span><span class="o">());</span>
+        <span class="n">member</span><span class="o">.</span><span class="na">setMemberNm</span><span class="o">(</span><span class="n">member</span><span class="o">.</span><span class="na">getMemberNm</span><span class="o">());</span>
+        <span class="n">member</span><span class="o">.</span><span class="na">setMemberEmail</span><span class="o">(</span><span class="n">member</span><span class="o">.</span><span class="na">getMemberEmail</span><span class="o">());</span>
+        <span class="n">member</span><span class="o">.</span><span class="na">setMemberTell</span><span class="o">(</span><span class="n">member</span><span class="o">.</span><span class="na">getMemberTell</span><span class="o">());</span>
+        <span class="n">member</span><span class="o">.</span><span class="na">setMemberRole</span><span class="o">(</span><span class="s">"MEMBER"</span><span class="o">);</span>
+
+        <span class="n">memberRepository</span><span class="o">.</span><span class="na">save</span><span class="o">(</span><span class="n">member</span><span class="o">);</span>
+    <span class="o">}</span>
+</code></pre></div></div>
+<ol>
+  <li>비밀번호 암호화</li>
+  <li>사용자 정보 저장</li>
+</ol>
+
+:ET

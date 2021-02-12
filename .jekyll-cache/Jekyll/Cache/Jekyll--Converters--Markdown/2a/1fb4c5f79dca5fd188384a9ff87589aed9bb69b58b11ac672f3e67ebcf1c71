@@ -1,0 +1,223 @@
+I"�.<h3>객체와 테이블 매핑</h3>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Entity</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">"entity_name"</span><span class="o">)</span> <span class="c1">// entity mapping</span>
+<span class="nd">@Table</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">"table_name"</span><span class="o">)</span> <span class="c1">// db table mapping</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">Member</span> <span class="o">{</span>
+
+    <span class="nd">@Id</span> <span class="c1">// key</span>
+    <span class="nd">@GeneratdValue</span><span class="o">(</span><span class="n">strategy</span> <span class="o">=</span> <span class="nc">GenerationType</span><span class="o">.</span><span class="na">IDENTITY</span><span class="o">)</span>
+    <span class="kd">private</span> <span class="nc">Long</span> <span class="n">id</span><span class="o">;</span> <span class="c1">// Integer보다 Long 권유</span>
+
+    <span class="nd">@Column</span> <span class="c1">//column</span>
+    <span class="kd">private</span> <span class="nc">String</span> <span class="n">memberId</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="nc">String</span> <span class="n">memberNm</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="nc">String</span> <span class="n">memberPw</span><span class="o">;</span>
+
+    <span class="o">...</span>
+<span class="o">}</span>
+</code></pre></div></div>
+<ul>
+  <li>기본키
+    <ul>
+      <li>Id: 직접 할당</li>
+      <li>GeneratedValue
+        <ul>
+          <li>GenerateType.IDENTITY : Mysql</li>
+          <li>GenerateType.TABLE : 키 생성용 테이블 생성, 성능이 떨어짐</li>
+          <li>GenerateType.SEQUENCE : 오라클, PostgreSQL, H2 등</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>컬럼
+    <ul>
+      <li>Column</li>
+      <li>Temporal
+        <ul>
+          <li>TemporalType.DATE : 날짜</li>
+          <li>TemporalType.TIME : 시간</li>
+          <li>TemporalType.TIMESTAMP : 날짜와 시간</li>
+        </ul>
+      </li>
+      <li>Enumerated
+        <ul>
+          <li>EnumType.STRING : enum 이름으로 저장</li>
+          <li>EnumType.ORDINAL : enum 순서 번호로 저장 (권장x)</li>
+        </ul>
+      </li>
+      <li>Transient : DB에 반영하지 않는 속성</li>
+    </ul>
+  </li>
+</ul>
+
+<hr />
+
+<h2>테이블 연관관계</h2>
+<p>테이블 사이는 조인과 외래키로 표현하나 객체는 참조로 표현</p>
+
+<p>테이블은 외래 키 하나로 두 테이블의 연관관계를 맺을 수 있으나
+객체는 단방향 연결 두 번(두 번의 참조)을 통해 양방향 연관관계를 맺음</p>
+
+<p><u><b>연관관계의 주인은 외래키가 있는 곳(참조하는 곳)</b></u></p>
+<ul>
+  <li>주인
+    <ul>
+      <li>참조하는 곳(외래 키가 있는 곳)</li>
+      <li>읽고 쓰기 가능</li>
+      <li>@JoinColumn(name=”참조하는 컬럼명”)</li>
+    </ul>
+  </li>
+  <li>주인 반대편
+    <ul>
+      <li>참조되는 곳</li>
+      <li>읽기만 가능</li>
+      <li>@OneToMany(mappedBy= “주인객체에서 매핑대상”)</li>
+    </ul>
+  </li>
+</ul>
+
+<h3>1. 일대일(OneToOne)</h3>
+<ul>
+  <li>그 반대도 일대일 관계</li>
+  <li>외래 키에 데이터베이스 유니크(UNI) 제약조건 추가</li>
+  <li>주 테이블이나 대상 테이블 중 외래키 선택 가능 (외래키가 있는 곳이 관계의 주인)
+<img src="../assets/img/onetoone" alt="img.png" />
+    <ol>
+      <li>
+        <p>대상 테이블에 외래 키가 있는 경우</p>
+
+        <p>주 테이블만 조회해도 대상 테이블에 데이터가 있는 지 확인 가능</p>
+
+        <p>값이 없으면 외래 키에 null 허용</p>
+      </li>
+      <li>
+        <p>주 테이블에 외래 키가 있는 경우</p>
+
+        <p>일대다 관계로 변경할 때 테이블 구조 유지</p>
+
+        <p>프록시 기능의 한계로 지연 로딩으로 설정해도 항상 즉시 로딩</p>
+      </li>
+    </ol>
+  </li>
+  <li>주 테이블(주인)
+    <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="nd">@Entity</span>
+  <span class="kd">public</span> <span class="kd">class</span> <span class="nc">Member</span> <span class="o">{</span>
+    
+      <span class="nd">@Id</span>
+      <span class="nd">@GeneratedValue</span>
+      <span class="kd">private</span> <span class="nc">Long</span> <span class="n">memberId</span><span class="o">;</span>
+    
+      <span class="nd">@Column</span>
+      <span class="kd">private</span> <span class="nc">String</span> <span class="n">memberName</span><span class="o">;</span>
+      <span class="kd">private</span> <span class="kt">int</span> <span class="n">memberAge</span><span class="o">;</span>
+    
+      <span class="nd">@OneToOne</span>
+      <span class="nd">@JoinColum</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">"lockerId"</span><span class="o">)</span> <span class="c1">//참조하는 컬럼명 </span>
+      <span class="kd">private</span> <span class="nc">Locker</span> <span class="n">locker</span><span class="o">;</span>
+  <span class="o">}</span>
+</code></pre></div>    </div>
+  </li>
+  <li>대상 테이블
+    <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="nd">@Entity</span>
+  <span class="kd">public</span> <span class="kd">class</span> <span class="nc">Locker</span> <span class="o">{</span>
+
+      <span class="nd">@Id</span> <span class="nd">@GeneratedValue</span>
+      <span class="kd">private</span> <span class="nc">Long</span> <span class="n">lockerId</span><span class="o">;</span>
+        
+      <span class="c1">//member객체에서 locker와 매핑</span>
+      <span class="nd">@OneToOne</span><span class="o">(</span><span class="n">mappedBy</span> <span class="o">=</span> <span class="s">"locker"</span><span class="o">)</span> 
+      <span class="kd">private</span> <span class="nc">Member</span> <span class="n">member</span><span class="o">;</span>
+  <span class="o">}</span>
+</code></pre></div>    </div>
+  </li>
+</ul>
+
+<h3>2. 일대다(OneToMany)</h3>
+<ul>
+  <li>일(1) 쪽이 연관관계 주인</li>
+  <li>@JoinColum을 꼭 사용해야 함</li>
+  <li>엔티티가 관리하는 외래 키가 다른 테이블에 있어 연관관계 관리를 위해 추가 update 쿼리를 실행해야함</li>
+  <li>일대다 지양, 다대일 양방향 매핑 사용할 것</li>
+  <li>주인
+    <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="nd">@Entity</span>
+  <span class="kd">public</span> <span class="kd">class</span> <span class="nc">Team</span> <span class="o">{</span>
+
+      <span class="nd">@Id</span>
+      <span class="nd">@GeneratedValue</span>
+      <span class="kd">private</span> <span class="nc">Long</span> <span class="n">teamId</span><span class="o">;</span>
+    
+      <span class="nd">@Column</span>
+      <span class="kd">private</span> <span class="nc">String</span> <span class="n">teamName</span><span class="o">;</span>
+    
+      <span class="nd">@OneToMany</span>
+      <span class="nd">@JoinColumn</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">"teamId"</span><span class="o">)</span> <span class="c1">//참조하는 컬럼명</span>
+      <span class="nc">List</span><span class="o">&lt;</span><span class="nc">Member</span><span class="o">&gt;</span> <span class="n">members</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">ArrayList</span><span class="o">&lt;</span><span class="nc">Member</span><span class="o">&gt;();</span>
+      <span class="o">}</span>
+</code></pre></div>    </div>
+  </li>
+  <li>반대편
+    <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="nd">@Entity</span>
+  <span class="kd">public</span> <span class="kd">class</span> <span class="nc">Member</span> <span class="o">{</span>
+    
+      <span class="nd">@Id</span>
+      <span class="nd">@GeneratedValue</span>
+      <span class="kd">private</span> <span class="nc">Long</span> <span class="n">memberId</span><span class="o">;</span>
+    
+      <span class="nd">@Column</span>
+      <span class="kd">private</span> <span class="nc">String</span> <span class="n">memberName</span><span class="o">;</span>
+      <span class="kd">private</span> <span class="kt">int</span> <span class="n">memberAge</span><span class="o">;</span>
+  <span class="o">}</span>
+</code></pre></div>    </div>
+  </li>
+</ul>
+
+<h3>3. 다대일(ManyToOne)</h3>
+<ul>
+  <li>가장 많이 사용하는 연관관계</li>
+  <li>반대 관계는 일대다(OneToMany)</li>
+  <li><code class="language-plaintext highlighter-rouge">외래 키가 있는 쪽이 연관관계의 주인</code></li>
+  <li>양쪽을 서로 참조하도록 개발(양방향 매핑)</li>
+  <li>연관관계의 주인 테이블
+    <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="nd">@Entity</span>
+  <span class="kd">public</span> <span class="kd">class</span> <span class="nc">Member</span> <span class="o">{</span>
+    
+      <span class="nd">@Id</span>
+      <span class="nd">@GeneratedValue</span>
+      <span class="kd">private</span> <span class="nc">Long</span> <span class="n">memberId</span><span class="o">;</span>
+    
+      <span class="nd">@Column</span>
+      <span class="kd">private</span> <span class="nc">String</span> <span class="n">memberName</span><span class="o">;</span>
+      <span class="kd">private</span> <span class="kt">int</span> <span class="n">memberAge</span><span class="o">;</span>
+    
+      <span class="c1">//참조하는 컬럼명</span>
+      <span class="nd">@ManyToOne</span>
+      <span class="nd">@JoinColum</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">"teamId"</span><span class="o">)</span>
+      <span class="kd">private</span> <span class="nc">Team</span> <span class="n">team</span><span class="o">;</span>
+  <span class="o">}</span>
+</code></pre></div>    </div>
+    <p><code class="language-plaintext highlighter-rouge">양방향 매핑 시 연관관계의 주인에 값 입력해야 함</code></p>
+  </li>
+  <li>주인이 아닌 테이블
+    <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="nd">@Entity</span>
+  <span class="kd">public</span> <span class="kd">class</span> <span class="nc">Team</span><span class="o">{</span>
+
+      <span class="nd">@Id</span>
+      <span class="nd">@GeneratedValue</span>
+      <span class="kd">private</span> <span class="nc">Long</span> <span class="n">teamId</span><span class="o">;</span>
+    
+      <span class="nd">@Column</span>
+      <span class="kd">private</span> <span class="nc">String</span> <span class="n">teamName</span><span class="o">;</span>
+    
+      <span class="c1">//주인 테이블에서 매핑되는 이름</span>
+      <span class="nd">@OneToMany</span><span class="o">(</span><span class="n">mappedBy</span> <span class="o">=</span> <span class="s">"team"</span><span class="o">)</span>
+      <span class="nc">List</span><span class="o">&lt;</span><span class="nc">Member</span><span class="o">&gt;</span> <span class="n">members</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">ArrayList</span><span class="o">&lt;</span><span class="nc">Member</span><span class="o">&gt;();</span>
+  <span class="o">}</span>
+</code></pre></div>    </div>
+  </li>
+</ul>
+
+<h3>4. 다대다(ManyToMany)</h3>
+<ul>
+  <li>실무에서 사용하지 않음</li>
+</ul>
+:ET

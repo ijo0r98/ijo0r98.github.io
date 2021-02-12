@@ -1,0 +1,66 @@
+I"f<h2>Spring Security</h2>
+
+<p>보안 솔루션을 제공하는 스프링 기반의 하위 프레임 워크</p>
+
+<p>스프링과 분리되어 별도의 filter 기반으로 동작</p>
+
+<p><img src="../assets/img/springsecurity" alt="img.png" /></p>
+
+<ol>
+  <li>CSRF 공격 방어</li>
+  <li>모든 URL에 대한 인증 요구</li>
+  <li>Session Fixation 공격 방어</li>
+  <li>요청 헤더 보안</li>
+  <li>서블릿 API 메소드와 통합</li>
+</ol>
+
+<p>인증 성공 후 인가 처리</p>
+<ul>
+  <li>
+    <p>인증(Authentication)</p>
+
+    <ul>
+      <li>해당 사용자가 본인이 맞는 지 확인</li>
+    </ul>
+  </li>
+  <li>
+    <p>권한(Authorization, 인가)</p>
+
+    <ul>
+      <li>사용자가 특정 자원에 대한 접근 권한이 있는지 확인</li>
+    </ul>
+  </li>
+</ul>
+
+<p>Credential 기반 인증 방식</p>
+<ul>
+  <li>
+    <p>Principal : 접근 주체, 보호 받는 자원에 접근하는 대상</p>
+  </li>
+  <li>
+    <p>Credintail : 자원에 접근하는 대상의 비밀번호</p>
+  </li>
+</ul>
+
+<hr />
+
+<h3>라이브러리 추가</h3>
+<ul>
+  <li>build.gradle
+    <div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>dependencies <span class="o">{</span>
+    ..
+    <span class="c">#spring security</span>
+    implementation <span class="s1">'org.springframework.boot:spring-boot-starter-security'</span>
+    <span class="c">#scurity tag 사용</span>
+    implementation <span class="s1">'org.springframework.security:spring-security-taglibs'</span>
+    ..
+<span class="o">}</span>
+</code></pre></div>    </div>
+  </li>
+  <li>application.properties
+    <div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="c"># Security logging</span>
+  logging.level.org.springframework.security<span class="o">=</span>debug
+</code></pre></div>    </div>
+  </li>
+</ul>
+:ET

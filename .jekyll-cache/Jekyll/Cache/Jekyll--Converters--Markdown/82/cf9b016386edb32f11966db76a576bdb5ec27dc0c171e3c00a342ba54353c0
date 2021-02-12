@@ -1,0 +1,38 @@
+I"�<h2>로그인</h2>
+<h3>AuthenticationProvider</h3>
+<p>입력된 로그인 정보와 DB에서 가져온 사용자 정보를 비교하는 인터페이스</p>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">class</span> <span class="nc">CustomAuthenticationProvider</span> <span class="kd">implements</span> <span class="nc">AuthenticationProvider</span> <span class="o">{</span>
+    <span class="nd">@Autowired</span>
+    <span class="kd">private</span> <span class="nc">PasswordEncoder</span> <span class="n">passwordEncoder</span><span class="o">;</span>
+    <span class="nd">@Autowired</span>
+    <span class="kd">private</span> <span class="nc">MemberService</span> <span class="n">memberService</span><span class="o">;</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="nc">Authentication</span> <span class="nf">authenticate</span><span class="o">(</span><span class="nc">Authentication</span> <span class="n">authentication</span><span class="o">)</span> <span class="kd">throws</span> <span class="nc">AuthenticationException</span> <span class="o">{</span>
+        <span class="c1">//Authentication 로그인 정보</span>
+        <span class="nc">String</span> <span class="n">username</span> <span class="o">=</span> <span class="o">(</span><span class="nc">String</span><span class="o">)</span> <span class="n">authentication</span><span class="o">.</span><span class="na">getPrincipal</span><span class="o">();</span> 
+        <span class="nc">String</span> <span class="n">password</span> <span class="o">=</span> <span class="o">(</span><span class="nc">String</span><span class="o">)</span> <span class="n">authentication</span><span class="o">.</span><span class="na">getCredentials</span><span class="o">();</span> 
+
+        <span class="nc">Member</span> <span class="n">member</span> <span class="o">=</span> <span class="n">memberService</span><span class="o">.</span><span class="na">loadUserByUsername</span><span class="o">(</span><span class="n">username</span><span class="o">);</span>
+
+        <span class="k">if</span> <span class="o">(!</span><span class="n">passwordEncoder</span><span class="o">.</span><span class="na">matches</span><span class="o">(</span><span class="n">password</span><span class="o">,</span> <span class="n">member</span><span class="o">.</span><span class="na">getPassword</span><span class="o">()))</span> <span class="o">{</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nf">BadCredentialsException</span><span class="o">(</span><span class="n">username</span><span class="o">);</span>
+        <span class="o">}</span>
+        <span class="k">if</span> <span class="o">(!</span><span class="n">member</span><span class="o">.</span><span class="na">isEnabled</span><span class="o">())</span> <span class="o">{</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nf">DisabledException</span><span class="o">(</span><span class="n">username</span><span class="o">);</span>
+        <span class="o">}</span>
+
+        <span class="k">return</span> <span class="k">new</span> <span class="nf">UsernamePasswordAuthenticationToken</span><span class="o">(</span><span class="n">member</span><span class="o">.</span><span class="na">getMemberId</span><span class="o">(),</span> <span class="n">member</span><span class="o">.</span><span class="na">getMemberPw</span><span class="o">(),</span> <span class="n">member</span><span class="o">.</span><span class="na">getAuthorities</span><span class="o">());</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">supports</span><span class="o">(</span><span class="nc">Class</span><span class="o">&lt;?&gt;</span> <span class="n">authentication</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="kc">true</span><span class="o">;</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+<ul>
+  <li>Authentication 로그인 정보</li>
+</ul>
+
+:ET

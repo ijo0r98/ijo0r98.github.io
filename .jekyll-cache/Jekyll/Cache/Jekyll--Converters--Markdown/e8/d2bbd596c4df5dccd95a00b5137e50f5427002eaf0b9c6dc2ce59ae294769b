@@ -1,0 +1,220 @@
+I"�%<h2>Spring Security</h2>
+
+<p>보안 솔루션을 제공하는 스프링 기반의 하위 프레임 워크</p>
+
+<p>스프링과 분리되어 별도의 filter 기반으로 동작</p>
+
+<p><img src="../assets/img/springsecurity" alt="img.png" /></p>
+
+<ol>
+  <li>CSRF 공격 방어</li>
+  <li>모든 URL에 대한 인증 요구</li>
+  <li>Session Fixation 공격 방어</li>
+  <li>요청 헤더 보안</li>
+  <li>서블릿 API 메소드와 통합</li>
+</ol>
+
+<p>인증 성공 후 인가 처리</p>
+<ul>
+  <li>
+    <p>인증(Authentication)</p>
+
+    <ul>
+      <li>해당 사용자가 본인이 맞는 지 확인</li>
+    </ul>
+  </li>
+  <li>
+    <p>권한(Authorization, 인가)</p>
+
+    <ul>
+      <li>사용자가 특정 자원에 대한 접근 권한이 있는지 확인</li>
+    </ul>
+  </li>
+</ul>
+
+<p>Credential 기반 인증 방식</p>
+<ul>
+  <li>
+    <p>Principal : 접근 주체, 보호 받는 자원에 접근하는 대상 ex) 이름, 아이디</p>
+  </li>
+  <li>
+    <p>Credintail : 자원에 접근하는 대상의 비밀번호</p>
+  </li>
+</ul>
+
+<hr />
+
+<h3>라이브러리 추가</h3>
+<ul>
+  <li>build.gradle
+    <div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>dependencies <span class="o">{</span>
+    ..
+    <span class="c">#spring security</span>
+    implementation <span class="s1">'org.springframework.boot:spring-boot-starter-security'</span>
+    <span class="c">#scurity tag 사용</span>
+    implementation <span class="s1">'org.springframework.security:spring-security-taglibs'</span>
+    ..
+<span class="o">}</span>
+</code></pre></div>    </div>
+  </li>
+  <li>application.properties
+    <div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="c"># Security logging</span>
+  logging.level.org.springframework.security<span class="o">=</span>debug
+</code></pre></div>    </div>
+  </li>
+</ul>
+
+<hr />
+<h2>SecurityConfig</h2>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Configuration</span>  <span class="c1">//어노테이션 기반 환경설정</span>
+<span class="nd">@EnableWebSecurity</span> <span class="c1">//spring security 활성화</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">SecurityConfig</span> <span class="kd">extends</span> <span class="nc">WebSecurityConfigurerAdapter</span> <span class="o">{</span>
+
+    <span class="c1">// 의존성 주입</span>
+
+    <span class="nd">@Bean</span>
+    <span class="kd">public</span> <span class="nc">PasswordEncoder</span> <span class="nf">passwordEncoder</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="k">new</span> <span class="nf">BCryptPasswordEncoder</span><span class="o">();</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">configure</span><span class="o">(</span><span class="nc">WebSecurity</span> <span class="n">web</span><span class="o">)</span> <span class="kd">throws</span> <span class="nc">Exception</span> <span class="o">{</span>
+        <span class="n">web</span><span class="o">.</span><span class="na">ignoring</span><span class="o">().</span><span class="na">antMatchers</span><span class="o">(</span><span class="s">"/css/**"</span><span class="o">,</span> <span class="s">"/js/**"</span><span class="o">,</span> <span class="s">"/img/**"</span><span class="o">,</span> <span class="s">"/lib/**"</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">protected</span> <span class="kt">void</span> <span class="nf">configure</span><span class="o">(</span><span class="nc">HttpSecurity</span> <span class="n">http</span><span class="o">)</span> <span class="kd">throws</span> <span class="nc">Exception</span> <span class="o">{</span>
+        <span class="n">http</span><span class="o">.</span><span class="na">authorizeRequests</span><span class="o">()</span>
+                <span class="o">.</span><span class="na">antMatchers</span><span class="o">(</span><span class="s">"/"</span><span class="o">,</span> <span class="s">"/error"</span><span class="o">,</span> <span class="s">"/favicon.ico"</span><span class="o">,</span>
+                        <span class="s">"/**/*.css"</span><span class="o">,</span>
+                        <span class="s">"/**/*.js"</span><span class="o">,</span>
+                        <span class="s">"/**/*.png"</span><span class="o">,</span>
+                        <span class="s">"/**/*.jpg"</span><span class="o">,</span>
+                        <span class="s">"/login*/*"</span><span class="o">).</span><span class="na">permitAll</span><span class="o">()</span>
+                <span class="o">.</span><span class="na">antMatchers</span><span class="o">(</span><span class="s">"/member/*"</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">authenticated</span><span class="o">()</span>
+                <span class="o">.</span><span class="na">and</span><span class="o">()</span>
+            <span class="o">.</span><span class="na">formLogin</span><span class="o">()</span>
+                <span class="o">.</span><span class="na">loginPage</span><span class="o">(</span><span class="s">"/login"</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">successHandler</span><span class="o">(</span><span class="n">customAuthenticationSuccessHandler</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">failureHandler</span><span class="o">(</span><span class="n">customAuthenticationFailHandler</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">and</span><span class="o">()</span>
+            <span class="o">.</span><span class="na">logout</span><span class="o">()</span>
+                <span class="o">.</span><span class="na">logoutSuccessUrl</span><span class="o">(</span><span class="s">"/login"</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">logoutRequestMatcher</span><span class="o">(</span><span class="k">new</span> <span class="nc">AntPathRequestMatcher</span><span class="o">(</span><span class="s">"/logout"</span><span class="o">))</span>
+                <span class="o">.</span><span class="na">invalidateHttpSession</span><span class="o">(</span><span class="kc">true</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">protected</span> <span class="kt">void</span> <span class="nf">configure</span><span class="o">(</span><span class="nc">AuthenticationManagerBuilder</span> <span class="n">auth</span><span class="o">)</span> <span class="kd">throws</span> <span class="nc">Exception</span> <span class="o">{</span>
+        <span class="n">auth</span><span class="o">.</span><span class="na">authenticationProvider</span><span class="o">(</span><span class="n">authenticationProvider</span><span class="o">());</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+<h3>PasswordEncoder</h3>
+<p>비밀번호 암호화, 복호화 로직</p>
+<h3>configure 메소드</h3>
+<ul>
+  <li>
+    <p>configure(WebSecurity web)</p>
+
+    <p>FilterChainProxy 생성, 다양한 Filter 설정 적용</p>
+    <ul>
+      <li>
+        <p>web.ignoring().antMatchers(정적파일경로)</p>
+
+        <p>정적 파일에 대한 시큐리티 절차 제외</p>
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p>configure(HttpSecurity http)</p>
+
+    <p>인터셉터로 http 요청을 안전하게 보호하는 방법 설정</p>
+
+    <ul>
+      <li>
+        <p>authorizeRequests()</p>
+
+        <p>요청 경로에 따라 접근 권한 설정</p>
+        <ul>
+          <li>
+            <p>antMatchers()</p>
+
+            <p>요청 경로 URL 패턴 지정</p>
+          </li>
+          <li>
+            <p>permitAll()</p>
+
+            <p>모든 사용자에게 접근 허용</p>
+          </li>
+          <li>
+            <p>authenticated()</p>
+
+            <p>인증된 사용자에게만 접근 허용</p>
+          </li>
+          <li>
+            <p>anonymous</p>
+
+            <p>인증되지 않은 사용자에게만 접근 허용</p>
+          </li>
+          <li>
+            <p>denyAll()</p>
+
+            <p>모든 사용자 접근 금지</p>
+          </li>
+          <li>
+            <p>hasRole()</p>
+
+            <p>특정 권한을 가진 사용자만 접근</p>
+          </li>
+        </ul>
+      </li>
+      <li>
+        <p>formLogin()</p>
+
+        <p>로그인에 대한 설정</p>
+        <ul>
+          <li>
+            <p>loginPage()</p>
+
+            <p>로그인 페이지 경로</p>
+          </li>
+          <li>
+            <p>successHandler(커스텀 핸들러)</p>
+
+            <p>로그인 성공 시 핸들러</p>
+          </li>
+          <li>
+            <p>failureHandler(커스텀 핸들러)</p>
+
+            <p>로그인 실패 시 핸들러</p>
+          </li>
+        </ul>
+      </li>
+      <li>
+        <p>logout()</p>
+
+        <p>로그아웃에 대한 설정</p>
+        <ul>
+          <li>
+            <p>logoutRequestMatcher(new AntPathRequestMatcher(경로))</p>
+
+            <p>로그아웃 경로</p>
+          </li>
+          <li>
+            <p>logoutSuccessUrl()</p>
+
+            <p>로그아웃 성공 시 이동할 경로</p>
+          </li>
+          <li>
+            <p>invalidateHttpSession()</p>
+
+            <p>로그아웃 성공 시 세션 제거</p>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+:ET

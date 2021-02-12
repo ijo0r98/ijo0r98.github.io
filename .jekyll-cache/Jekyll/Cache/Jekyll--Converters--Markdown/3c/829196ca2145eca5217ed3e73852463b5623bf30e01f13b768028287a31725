@@ -1,0 +1,111 @@
+I"5/<h2>로그인</h2>
+<h3>AuthenticationProvider</h3>
+<p>입력된 로그인 정보와 DB에서 가져온 사용자 정보를 비교하는 인터페이스</p>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">class</span> <span class="nc">CustomAuthenticationProvider</span> <span class="kd">implements</span> <span class="nc">AuthenticationProvider</span> <span class="o">{</span>
+    <span class="nd">@Autowired</span>
+    <span class="kd">private</span> <span class="nc">PasswordEncoder</span> <span class="n">passwordEncoder</span><span class="o">;</span>
+    <span class="nd">@Autowired</span>
+    <span class="kd">private</span> <span class="nc">MemberService</span> <span class="n">memberService</span><span class="o">;</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="nc">Authentication</span> <span class="nf">authenticate</span><span class="o">(</span><span class="nc">Authentication</span> <span class="n">authentication</span><span class="o">)</span> <span class="kd">throws</span> <span class="nc">AuthenticationException</span> <span class="o">{</span>
+        <span class="nc">String</span> <span class="n">username</span> <span class="o">=</span> <span class="o">(</span><span class="nc">String</span><span class="o">)</span> <span class="n">authentication</span><span class="o">.</span><span class="na">getPrincipal</span><span class="o">();</span> 
+        <span class="nc">String</span> <span class="n">password</span> <span class="o">=</span> <span class="o">(</span><span class="nc">String</span><span class="o">)</span> <span class="n">authentication</span><span class="o">.</span><span class="na">getCredentials</span><span class="o">();</span> 
+
+        <span class="nc">Member</span> <span class="n">member</span> <span class="o">=</span> <span class="n">memberService</span><span class="o">.</span><span class="na">loadUserByUsername</span><span class="o">(</span><span class="n">username</span><span class="o">);</span>
+
+        <span class="k">if</span> <span class="o">(!</span><span class="n">passwordEncoder</span><span class="o">.</span><span class="na">matches</span><span class="o">(</span><span class="n">password</span><span class="o">,</span> <span class="n">member</span><span class="o">.</span><span class="na">getPassword</span><span class="o">()))</span> <span class="o">{</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nf">BadCredentialsException</span><span class="o">(</span><span class="n">username</span><span class="o">);</span>
+        <span class="o">}</span> <span class="c1">// 1</span>
+        <span class="k">if</span> <span class="o">(!</span><span class="n">member</span><span class="o">.</span><span class="na">isEnabled</span><span class="o">())</span> <span class="o">{</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nf">DisabledException</span><span class="o">(</span><span class="n">username</span><span class="o">);</span>
+        <span class="o">}</span> <span class="c1">// 2</span>
+
+        <span class="k">return</span> <span class="k">new</span> <span class="nf">UsernamePasswordAuthenticationToken</span><span class="o">(</span><span class="n">member</span><span class="o">.</span><span class="na">getMemberId</span><span class="o">(),</span> <span class="n">member</span><span class="o">.</span><span class="na">getMemberPw</span><span class="o">(),</span> <span class="n">member</span><span class="o">.</span><span class="na">getAuthorities</span><span class="o">());</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">supports</span><span class="o">(</span><span class="nc">Class</span><span class="o">&lt;?&gt;</span> <span class="n">authentication</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="kc">true</span><span class="o">;</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+<ul>
+  <li>Authentication 로그인 정보
+    <ul>
+      <li>principal : 이름(아이디)</li>
+      <li>credentials: 비밀번호</li>
+    </ul>
+  </li>
+  <li>
+    <p>UsernamePasswordAuthenticationToken</p>
+
+    <p>Authentication 인터페이스의 구현체로 인증 성공 시 토큰 생성하여 반환</p>
+  </li>
+</ul>
+
+<ol>
+  <li>DB에 저장된 비밀번호와 비교하여 다를 때 예외처리</li>
+  <li>비활성화된 계정에 대해 예외처리
+    <ul>
+      <li>
+        <p>isEnabled()</p>
+
+        <p>UserDetails 메소드 Member엔티티에서 오버라이딩</p>
+        <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="nd">@Override</span>
+ <span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">isEnabled</span><span class="o">()</span> <span class="o">{</span>
+     <span class="k">if</span> <span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="na">memberYn</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="s">"Y"</span><span class="o">))</span> <span class="o">{</span>
+          <span class="k">return</span> <span class="kc">true</span><span class="o">;</span>
+     <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+          <span class="k">return</span> <span class="kc">false</span><span class="o">;</span>
+     <span class="o">}</span>
+ <span class="o">}</span>
+</code></pre></div>        </div>
+      </li>
+    </ul>
+  </li>
+</ol>
+
+<h3>AuthenticationSuccessHandler</h3>
+<p>로그인 성공 시 핸들러</p>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Component</span> <span class="c1">//구현한 클래스 bean으로 등록</span>
+<span class="nd">@RequiredArgsConstructor</span> <span class="c1">// 초기화되지 않은 final이나 nonnall 의존성 주입</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">CustomAuthenticationSuccessHandler</span> <span class="kd">implements</span> <span class="nc">AuthenticationSuccessHandler</span> <span class="o">{</span>
+
+    <span class="kd">private</span> <span class="kd">final</span> <span class="nc">RequestCache</span> <span class="n">requestCache</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">HttpSessionRequestCache</span><span class="o">();</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="nc">RedirectStrategy</span> <span class="n">redirectStratgy</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">DefaultRedirectStrategy</span><span class="o">();</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onAuthenticationSuccess</span><span class="o">(</span><span class="nc">HttpServletRequest</span> <span class="n">request</span><span class="o">,</span> <span class="nc">HttpServletResponse</span> <span class="n">response</span><span class="o">,</span> <span class="nc">Authentication</span> <span class="n">authentication</span><span class="o">)</span> <span class="kd">throws</span> <span class="nc">IOException</span><span class="o">,</span> <span class="nc">ServletException</span> <span class="o">{</span>
+        <span class="nc">HttpSession</span> <span class="n">session</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="na">getSession</span><span class="o">();</span> 
+        
+        <span class="n">session</span><span class="o">.</span><span class="na">setAttribute</span><span class="o">(</span><span class="s">"greeting"</span><span class="o">,</span> <span class="n">authentication</span><span class="o">.</span><span class="na">getName</span><span class="o">()</span> <span class="o">+</span> <span class="s">"님 반갑습니다."</span><span class="o">);</span> <span class="c1">//1</span>
+        <span class="n">response</span><span class="o">.</span><span class="na">sendRedirect</span><span class="o">(</span><span class="s">"/member"</span><span class="o">);</span> <span class="c1">//2</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h3>AuthenticationFailureHandler</h3>
+<p>로그인 실패 시 핸들러</p>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Component</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">CustomAuthenticationFailureHandler</span> <span class="kd">implements</span> <span class="nc">AuthenticationFailureHandler</span> <span class="o">{</span>
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onAuthenticationFailure</span><span class="o">(</span><span class="nc">HttpServletRequest</span> <span class="n">request</span><span class="o">,</span> <span class="nc">HttpServletResponse</span> <span class="n">response</span><span class="o">,</span> <span class="nc">AuthenticationException</span> <span class="n">exception</span><span class="o">)</span> <span class="kd">throws</span> <span class="nc">IOException</span><span class="o">,</span> <span class="nc">ServletException</span> <span class="o">{</span>
+        <span class="nc">String</span> <span class="n">errorMsg</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+
+        <span class="k">if</span> <span class="o">(</span><span class="n">exception</span> <span class="k">instanceof</span> <span class="nc">BadCredentialsException</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">errorMsg</span> <span class="o">=</span> <span class="s">"아이디 또는 비밀번호가 일치하지않습니다"</span><span class="o">;</span>
+        <span class="o">}</span> <span class="k">else</span> <span class="k">if</span><span class="o">(</span><span class="n">exception</span> <span class="k">instanceof</span> <span class="nc">UsernameNotFoundException</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">errorMsg</span> <span class="o">=</span> <span class="s">"존재하지 않는 사용자입니다."</span><span class="o">;</span>
+        <span class="o">}</span> <span class="k">else</span> <span class="k">if</span><span class="o">(</span><span class="n">exception</span> <span class="k">instanceof</span> <span class="nc">DisabledException</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">errorMsg</span> <span class="o">=</span> <span class="s">"비활성화된 계정입니다."</span><span class="o">;</span>
+        <span class="o">}</span> <span class="k">else</span> <span class="k">if</span><span class="o">(</span><span class="n">exception</span> <span class="k">instanceof</span> <span class="nc">LockedException</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">errorMsg</span> <span class="o">=</span> <span class="s">"잠긴 계정입니다."</span><span class="o">;</span>
+        <span class="o">}</span>
+
+        <span class="n">request</span><span class="o">.</span><span class="na">setAttribute</span><span class="o">(</span><span class="s">"errorMsg"</span><span class="o">,</span> <span class="n">errorMsg</span><span class="o">);</span>
+        <span class="n">request</span><span class="o">.</span><span class="na">getRequestDispatcher</span><span class="o">(</span><span class="s">"/login?error=true"</span><span class="o">).</span><span class="na">forward</span><span class="o">(</span><span class="n">request</span><span class="o">,</span> <span class="n">response</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+:ET

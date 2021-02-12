@@ -1,0 +1,38 @@
+I"�<h3>내가 보려고 정리한 Git 명령어</h3>
+<ul>
+  <li>Download
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  git init
+  git clone &lt;저장소 url&gt;
+</code></pre></div>    </div>
+  </li>
+  <li>Upload
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git init
+git add <span class="nb">.</span>
+git commit <span class="nt">-m</span> <span class="s2">"커밋 메세지"</span>
+git remote add origin &lt;저장소 URL&gt;
+git push origin master
+</code></pre></div>    </div>
+  </li>
+  <li>기타
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">#현재 상태</span>
+git status
+  
+<span class="c">#로그</span>
+git log
+   
+<span class="c">#저장소 삭제</span>
+git remote <span class="nb">rm</span> &lt;저장소 URL&gt;
+  
+<span class="c">#git 새로운 파일을 추가</span>
+git add &lt;파일&gt;
+  
+<span class="c">#git 모든 원격 브랜치 목록 보기</span>
+git branch <span class="nt">-r</span>
+
+<span class="c">#git 브랜치 생성</span>
+git branch &lt;브랜치 이름&gt;
+</code></pre></div>    </div>
+  </li>
+</ul>
+
+:ET
