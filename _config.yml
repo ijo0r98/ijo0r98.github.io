@@ -1,0 +1,45 @@
+
+title: Juran's DevBlog #Your awesome title
+email: ijo0r98@naver.com
+description: > # this means to ignore newlines until "baseurl"
+  Juran's develop blog
+
+baseurl: # the subpath of the site
+url: https://ijo0r98.github.io # the base hostname & protocol for your site
+
+permalink: /:year-:month/:title
+timezone:
+
+favicon: /assets/img/favicon.ico
+
+google_analytics: #UA—XXXXXXXX-X
+disqus_shortname: #disqus shortname
+
+user:
+  name: Juran
+  pic: /assets/img/ryan_smile.gif
+  picAlt: "catbook"
+  job: a developer
+  aboutme: true # comment this out if you don't need the 'about' page.
+
+exclude:
+  - README.md
+  - LICENSE
+  - github
+
+defaults:
+  - scope:
+      path: "_posts"
+      type: posts
+    values:
+      layout: post
+      comment: false
+
+markdown_ext: "markdown,mkdown,mkdn,mkd,md"
+markdown: kramdown 
+
+# Filtering Content
+show_drafts: null
+limit_posts: 0
+future:      false
+unpublished: false
