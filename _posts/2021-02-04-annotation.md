@@ -8,9 +8,6 @@ comments: false
 - @Configuration
     
     설정파일로 등록
-- @Component
-    
-    개발자가 구현한 클래스 bean으로 등록
 - @RequiredArgsConstructor
   
     초기화되지 않은 final이나 nonnall 생성자 생성
@@ -42,5 +39,21 @@ comments: false
     개발자가 컨트롤 불가능한 외부 라이브러리 등록
   
   * @Component
+
+    개발자가 구현한 클래스 bean으로 등록
   
-    직접 컨트롤 가능한 클래스에 사용, 클래스 자체를 빈으로 등록
+- 컨트롤러
+
+  * @Controller
+
+    ViewResolver이용하여 View 반환
+  
+    @ResponseBody이용하여 HttpMessageConverter가 동작해 데이터 반환도 가능
+
+  * @RestController
+
+    Spring MVC Controller에 @ResponseBody 추가
+  
+    Json형태로 객체 데이터 반환
+  
+    
