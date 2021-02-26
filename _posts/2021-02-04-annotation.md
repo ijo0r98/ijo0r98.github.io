@@ -1,6 +1,6 @@
 ---
-title: (Spring) Annotation 정리
-categories: [java&spring]
+title: JAVA Annotation 정리
+categories: [web]
 comments: false
 ---
 
